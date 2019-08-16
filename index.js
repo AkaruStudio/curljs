@@ -12,10 +12,10 @@ var cp = require('child_process');
 //    NTLM_PROXY       : 0
 //
 
-var curl = function(url, options, callback) {
-//    opts.clear();
+var curl = function (url, options, callback) {
+    //    opts.clear();
 
-    callback = callback || function () {};
+    callback = callback || function () { };
 
 
     if (typeof options == "function") {
@@ -34,7 +34,7 @@ var curl = function(url, options, callback) {
     curlString += options.stringify();
 
     try {
-        cp.exec(curlString, function(err, stdout, stderr) {
+        cp.exec(curlString, { maxBuffer: 1024 * 500 }, function (err, stdout, stderr) {
             callback(err, stdout, stderr);
         });
     } catch (err) {
@@ -42,20 +42,20 @@ var curl = function(url, options, callback) {
     }
 }
 
-var optionsBuilder = function() {
-    var _string      = '';
-    var _verboseOpt  = "-v";
+var optionsBuilder = function () {
+    var _string = '';
+    var _verboseOpt = "-v";
     var _redirectOpt = "-L";
-    var _silentOpt   = "-S";
+    var _silentOpt = "-S";
     var _insecureOpt = "-k";
-    var _postOpt     = '--data';
+    var _postOpt = '--data';
     var _postUrlEncodeOpt = "--data-urlencode";
-    var _maxRedirsOpt   = "--max-redirs";
-    var _timeoutOpt  = "--connect-timeout";
-    var _ntlmOpt     = "-ntlm";
+    var _maxRedirsOpt = "--max-redirs";
+    var _timeoutOpt = "--connect-timeout";
+    var _ntlmOpt = "-ntlm";
     var _ntlmProxyOpt = "--proxy-ntlm";
 
-    var modifyOptionString = function(opt, add) {
+    var modifyOptionString = function (opt, add) {
         if (add !== false) {
             addOption(opt)
         } else {
@@ -63,22 +63,22 @@ var optionsBuilder = function() {
         }
     }
 
-    var addOption = function(opt) {
+    var addOption = function (opt) {
         _string += opt + ' ';
     }
 
-    var removeOption = function(opt) {
+    var removeOption = function (opt) {
         _string = _string.replace(new RegExp(opt, "g"), '');
     }
 
-    var buildPostString = function(baseString, o){
+    var buildPostString = function (baseString, o) {
         var string = baseString + ' "';
 
         for (var key in o) {
             string += key + '=' + o[key] + '&';
         }
 
-        if (string.substr(o, string.length -1) === "&") {
+        if (string.substr(o, string.length - 1) === "&") {
             string = string.substr(0, string.length - 1); // remove the trailing &
         }
 
@@ -87,26 +87,26 @@ var optionsBuilder = function() {
         return string;
     }
 
-    this.stringify = function() {
+    this.stringify = function () {
         return _string;
     }
-    this.verbose = function(o) {
+    this.verbose = function (o) {
         modifyOptionString(_verboseOpt, o);
         return this;
     }
-    this.follow_redirects = function(o) {
+    this.follow_redirects = function (o) {
         modifyOptionString(_redirectOpt, o);
         return this;
     }
-    this.silent = function(o) {
+    this.silent = function (o) {
         modifyOptionString(_silentOpt, o);
         return this;
     }
-    this.ignore_cert = function(o) {
+    this.ignore_cert = function (o) {
         modifyOptionString(_insecureOpt, o);
         return this;
     }
-    this.max_redirs = function(maxRedirs, o) {
+    this.max_redirs = function (maxRedirs, o) {
         if (!maxRedirs) {
             maxRedirs = 0;
         }
@@ -117,7 +117,7 @@ var optionsBuilder = function() {
         modifyOptionString(_maxRedirsOpt, o);
         return this;
     }
-    this.connect_timeout = function(timeout, o) {
+    this.connect_timeout = function (timeout, o) {
         if (!timeout) {
             timeout = 0;
         }
@@ -128,15 +128,15 @@ var optionsBuilder = function() {
         modifyOptionString(_timeoutOpt, o);
         return this;
     }
-    this.ntlm = function(o) {
+    this.ntlm = function (o) {
         modifyOptionString(_ntlmOpt, o);
         return this;
     }
-    this.ntlm_proxy = function(o) {
+    this.ntlm_proxy = function (o) {
         modifyOptionString(_ntlmProxyOpt, o);
         return this;
     }
-    this.post_data = function(o) {
+    this.post_data = function (o) {
         removeOption(_postOpt);
 
         if (typeof o === "object") {
@@ -148,7 +148,7 @@ var optionsBuilder = function() {
         return this;
 
     }
-    this.post_data_urlencode = function(o) {
+    this.post_data_urlencode = function (o) {
         removeOption(_postUrlEncodeOpt);
 
         if (typeof o === "object") {
@@ -159,14 +159,14 @@ var optionsBuilder = function() {
 
         return this;
     }
-    this.clear = function() {
+    this.clear = function () {
         _string = '';
     }
 
     return this;
 }
 
-var opts = (function() {
+var opts = (function () {
     return new optionsBuilder();
 })();
 
